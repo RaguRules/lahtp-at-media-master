@@ -1,0 +1,15 @@
+Production:
+  stage: deploy
+  script:
+  - cd /var/www/
+  - sudo rm -rf html
+  - sudo cp -R /home/gitlab-runner/builds/cfc7f159/0/at-core/at-media .
+  - sudo mv at-media html
+  - sudo chown -R www-data:www-data html
+  - sudo chmod 777 html/cache
+  - sudo mkdir html/garbage && sudo chmod 777 html/garbage
+  environment:
+    name: Production
+    url: https://upload.aftertutor.com
+  only:
+  - master

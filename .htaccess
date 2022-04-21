@@ -1,0 +1,49 @@
+php_value upload_max_filesize 512M
+php_value post_max_size 512M
+
+ServerSignature Off
+
+#Options +MultiViews
+Options -Indexes
+
+# Use UTF-8 encoding for anything served text/plain or text/html
+AddDefaultCharset utf-8
+
+#Catching
+
+RewriteEngine on
+RewriteBase /
+
+## For api
+RewriteRule ^/?api/([^/]+)?$ "api.php?rquest=$1" [L,QSA]
+RewriteRule ^/?api/([^/]+)/([^/]+)?$ "api.php?rquest=$2&ns=$1" [L,QSA]
+
+## For general files, if not above, just remove .php
+
+# Redirect external .php requests to 404 Error (Pretending that I am not doing PHP)
+RewriteCond %{THE_REQUEST} ^(.+)\.php([#?][^\ ]*)?\ HTTP/
+RewriteRule ^(.+)\.php$ "http://%{HTTP_HOST}/$1" [R=404,L]
+
+# Resolve .test.php file for extensionless php test urls
+RewriteCond %{REQUEST_FILENAME}\.test.php -f
+RewriteRule ^([^/.]+)$ $1.test.php [L]
+
+# Resolve .php file for extensionless php urls
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^/.]+)$ $1.php [L]
+
+# Unless directory, remove trailing slash
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([^/]+)/$ "http://%{HTTP_HOST}/$1" [R=301,L]
+
+## For profiles - (should be at last)
+#Rules - Username should be alphanumeric, characters allowed (_,-) Spaces not allowed.
+
+# Filename is already re-written with .php, so no need to add it here.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)?$ "index.php?path=$1" [QSA,L]
+
+
+
+
